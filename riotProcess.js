@@ -38,7 +38,7 @@ async function getActiveGame(puuid) {
 
     if (!participant) {
       console.log("Participante não encontrado na partida ativa.");
-      return null;
+      return false;
     }
 
     console.log("Participante encontrado");
