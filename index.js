@@ -1,11 +1,25 @@
 const chatControl = require("./riotProcess");
 const express = require("express");
-const { createServer } = require("http");
-const socketIo = require("socket.io");
-
 const app = express();
-const server = createServer(app);
-const io = socketIo(server);
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+    credentials: true, //access-control-allow-credentials:true
+    optionSuccessStatus: 200,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Origin",
+      "X-Requested-With",
+      "Accept",
+      "x-client-key",
+      "x-client-token",
+      "x-client-secret",
+      "Authorization",
+    ],
+  },
+});
 
 io.on("connection", async (socket) => {
   console.log("Novo usuário conectado:", socket.id);
