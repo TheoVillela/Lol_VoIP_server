@@ -1,5 +1,5 @@
 const axios = require("axios");
-const RIOT_API_KEY = "RGAPI-15b8c57f-899f-4680-b1ac-dd6c2b65a013";
+const RIOT_API_KEY = "RGAPI-0c6c5916-5756-44e5-9310-bd6365c9790c";
 const RIOT_REGION = "br1";
 
 async function getPuuId(summonerName, tagLine) {
