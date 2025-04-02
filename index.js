@@ -20,7 +20,9 @@ io.on("connection", async (socket) => {
     socket.disconnect();
   }
 
-  //  Usuário saindo da sala
+  console.log("Novo usuário conectado:", socket.id);
+
+  //  Usuário saindo da sala // falta implementar no cliente
   socket.on("leaveRoom", (gameId) => {
     socket.leave(gameId);
     socket.to(gameId).emit("user-left", socket.id);
