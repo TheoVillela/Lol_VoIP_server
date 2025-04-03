@@ -1,10 +1,10 @@
-const axios = require("axios");
+import ax from "axios";
 const RIOT_API_KEY = "RGAPI-0c6c5916-5756-44e5-9310-bd6365c9790c";
 const RIOT_REGION = "br1";
 
 async function getPuuId(summonerName, tagLine) {
   try {
-    const response = await axios.get(
+    const response = await ax.get(
       `https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${summonerName}/${tagLine}/`,
       {
         headers: {
@@ -12,6 +12,7 @@ async function getPuuId(summonerName, tagLine) {
         },
       }
     );
+
     return response.data.puuid; // Retorna o summonerId
   } catch (error) {
     console.error("Erro ao obter summonerId:", error);
@@ -22,7 +23,7 @@ async function getPuuId(summonerName, tagLine) {
 // Função para obter o game ativo do usuario PuuID
 async function getActiveGame(puuid) {
   try {
-    const response = await axios.get(
+    const response = await ax.get(
       `https://${RIOT_REGION}.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/${puuid}`,
       {
         headers: {
@@ -62,4 +63,4 @@ async function getActiveGame(puuid) {
   }
 }
 
-module.exports = { getPuuId, getActiveGame };
+export default { getPuuId, getActiveGame };

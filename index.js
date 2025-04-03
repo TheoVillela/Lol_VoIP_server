@@ -1,85 +1,81 @@
-const chatControl = require("./riotProcess");
-const express = require("express");
+import express from "express";
+import { createServer } from "http";
+import { Server } from "socket.io";
+import riot from "./riotProcess.js";
+
+const rooms = {};
 const app = express();
-const server = require("http").createServer(app);
-const io = require("socket.io")(server, {
+const rotas = express.Router();
+
+rotas.get("/getUserID", async (req, res) => {
+  const { summonerName, tagLine } = req.query;
+
+  console.log(summonerName + ": " + tagLine);
+  const puuid = await riot.getPuuId(summonerName, tagLine);
+
+  res.status(200).send({ puuid: puuid });
+});
+
+rotas.get("/check/", (req, res) => {
+  res.status(200).send({ message: "Tudo OK!" });
+});
+
+rotas.get("/getActiveGame/", async (req, res) => {
+  const { puuid } = req.query;
+  const data = await riot.getActiveGame(puuid);
+
+  res.status(200).send({ data });
+});
+
+app.use(rotas);
+
+const server = createServer(app);
+
+const io = new Server(server, {
   cors: {
     origin: "*",
-    credentials: true, //access-control-allow-credentials:true
-    optionSuccessStatus: 200,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
-    allowedHeaders: [
-      "Content-Type",
-      "Origin",
-      "X-Requested-With",
-      "Accept",
-      "x-client-key",
-      "x-client-token",
-      "x-client-secret",
-      "Authorization",
-    ],
+    methods: ["GET", "POST"],
   },
 });
 
-io.on("connection", async (socket) => {
-  console.log("Novo usuário conectado:", socket.id);
+io.on("connection", (socket) => {
+  console.log("Novo cliente conectado:", socket.id);
 
-  const result = await verificaUsuarioPartida(socket);
+  socket.emit("connected");
+  // Entrar em uma sala
+  socket.on("joinRoom", (data) => {
+    const gameId = data.gameID;
+    console.log(gameId);
+    socket.join(gameId);
+    console.log(`Usuário ${socket.id} entrou na sala ${gameId}`);
 
-  if (!result) {
-    socket.emit("connectionFailed", {
-      code: "007",
-      data: "Não possui partida em andamento",
-    });
-    socket.disconnect();
-  }
+    // Criar um array para armazenar os usuários da sala, se não existir ainda
+    if (!rooms[gameId]) {
+      rooms[gameId] = [];
+    }
 
-  console.log("Novo usuário conectado:", socket.id);
+    // Enviar a lista de usuários já na sala para o novo cliente
+    socket.emit("user-list", rooms[gameId]);
 
-  //  Usuário saindo da sala // falta implementar no cliente
-  socket.on("leaveRoom", (gameId) => {
+    // Avisar os outros usuários na sala que um novo cliente entrou
+    socket.to(gameId).emit("user-joined", socket.id);
+
+    // Adicionar o novo usuário à lista da sala
+    rooms[gameId].push(socket.id);
+  });
+
+  // Troca de mensagens WebRTC
+  socket.on("signal", ({ to, data }) => {
+    io.to(to).emit("signal", { from: socket.id, data });
+  });
+
+  // Sair da sala
+  socket.on("disconnect", ({ gameId }) => {
     socket.leave(gameId);
-    socket.to(gameId).emit("user-left", socket.id);
-  });
-
-  socket.on("audio1", (data) => {
-    const { game_id, data_audio } = data;
-    socket.to(game_id).emit("audio1", data_audio);
-  });
-
-  //  Desconectar usuário
-  socket.on("disconnect", (gameId) => {
-    console.log(`Usuário desconectado: ${socket.id}`);
-    socket.to(gameId).emit("user-left", socket.id);
+    console.log(`Usuário ${socket.id} desconectou.`);
   });
 });
 
 server.listen(3000, () => {
-  console.log("Servidor Socket.IO rodando na porta 3000");
+  console.log("Servidor rodando na porta 3000");
 });
-
-async function verificaUsuarioPartida(socket) {
-  let { summonerName, tagLine } = socket.handshake.auth;
-  console.log(`Name: ${summonerName}, tag ${tagLine}`);
-
-  // Obtém PuuId e informações da partida
-  let PuuId = await chatControl.getPuuId(summonerName, tagLine);
-  let match = await chatControl.getActiveGame(PuuId);
-
-  if (!match) {
-    return false;
-  }
-  // Define o gameid+teamid
-  let gameId = match.gameId + match.teamId;
-
-  // **Adiciona o cliente na sala**
-  socket.join(gameId);
-  console.log(`Usuário ${socket.id} entrou na sala ${gameId}`);
-
-  // Avisar os outros clientes na sala que um novo usuário entrou
-  socket.to(gameId).emit("new-user", socket.id);
-
-  socket.emit("game-id", { gameId });
-
-  return true;
-}
