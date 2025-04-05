@@ -1,10 +1,17 @@
 import express from "express";
 import { createServer } from "http";
 import riot from "./riotProcess.js";
+import cors from "cors";
 
 const rooms = {};
 const app = express();
 const rotas = express.Router();
+
+app.use(
+  cors({
+    origin: "*", // ou '*' http://localhost:5173
+  })
+);
 
 rotas.get("/getUserID", async (req, res) => {
   const { summonerName, tagLine } = req.query;
