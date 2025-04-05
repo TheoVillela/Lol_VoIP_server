@@ -15,7 +15,6 @@
     "axios": "^1.8.4",
     "express": "^5.1.0",
     "http": "^0.0.1-security",
-    "socket.io": "^4.8.1",
-    "socketio": "^1.0.0"
+    "cors": "2.8.17"
   }
 }
