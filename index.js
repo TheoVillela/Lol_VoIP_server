@@ -9,7 +9,7 @@ const rotas = express.Router();
 
 app.use(
   cors({
-    origin: "*", // ou '*' http://localhost:5173
+    origin: "https://voip-da-galera.vercel.app/", // ou '*' http://localhost:5173
   })
 );
 
