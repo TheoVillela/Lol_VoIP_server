@@ -1,4 +1,5 @@
 import ax from "axios";
+
 const RIOT_API_KEY = "RGAPI-2dfb05cd-53c7-4e52-923f-1f11ded8c1db";
 const RIOT_REGION = "br1";
 
@@ -39,7 +40,7 @@ async function getActiveGame(puuid) {
 
     if (!participant) {
       console.log("Participante não encontrado na partida ativa.");
-      return false;
+      return null;
     }
 
     console.log("Participante encontrado");
@@ -54,12 +55,12 @@ async function getActiveGame(puuid) {
     // Verifica se o erro é de "não encontrado" (404)
     if (error.response && error.response.status === 404) {
       console.log("Nenhuma partida ativa encontrada para o invocador.");
-      return false; // Retorna null quando não encontrar uma partida ativa
+      return null; // Retorna null quando não encontrar uma partida ativa
     }
 
     // Outros erros são lançados normalmente
     console.error("Erro ao obter a partida ativa:", error);
-    return false;
+    return null;
   }
 }
 
