@@ -42,7 +42,7 @@ rotas.post("/connectUser/", async (req, res) => {
 
   const userConnected = CheckUserLogged(puuid);
 
-  console.log(`Puuid encontrado? ${userConnected}`);
+  console.log(`Puuid encontrado? : ${userConnected}`);
 
   if (userConnected) {
     res.status(304).send({ message: "Usuario ja Conectado" });
