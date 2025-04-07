@@ -45,7 +45,7 @@ rotas.post("/connectUser/", async (req, res) => {
   console.log(`Puuid encontrado? : ${userConnected}`);
 
   if (userConnected) {
-    res.status(304).send({ message: "Usuario ja Conectado" });
+    res.status(201).send({ message: "Usuario ja Conectado" });
   } else {
     ConnectUser(puuid);
     res.status(200).send({ message: "Usuario connectado com sucesso" });
