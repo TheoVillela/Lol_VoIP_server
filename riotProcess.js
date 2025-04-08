@@ -1,6 +1,6 @@
 import ax from "axios";
 
-const RIOT_API_KEY = "RGAPI-9898f9f4-c9f6-4a0e-83b8-9d0a1f93fe97";
+const RIOT_API_KEY = "RGAPI-0a25bd21-8587-4e05-9722-c12d06961dcc";
 const RIOT_REGION = "br1";
 
 async function getPuuId(summonerName, tagLine) {
