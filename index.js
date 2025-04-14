@@ -12,7 +12,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "https://voip-da-galera.vercel.app", // ou '*' http://localhost:5173[, "*"]
+    origin: "https://voicedagalera.vercel.app", // ou '*' http://localhost:5173[, "*"]
   })
 );
 
